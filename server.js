@@ -1,3 +1,4 @@
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
@@ -5,18 +6,18 @@ const axios = require('axios');
 const app = express();
 app.use(bodyParser.json());
 
-// ===== YOUR CREDENTIALS =====
-const PHONE_NUMBER_ID = "1385105994689983"; // From your screenshot
-const VERIFY_TOKEN = "VJS2025VERIFY"; // You will use this in Meta
-const ACCESS_TOKEN = process.env.ACCESS_TOKEN; // Set in Render env var
+// ===== YOUR CREDENTIALS - CORRECTED TAGLINE =====
+const PHONE_NUMBER_ID = "1385105994689983";
+const VERIFY_TOKEN = "VJS2025VERIFY";
+const ACCESS_TOKEN = process.env.ACCESS_TOKEN;
 const PORT = process.env.PORT || 3000;
 
-// Health check
+const FOOTER = "Honesty • Transparency • Commitment Since 2000 | MahaRERA Certified";
+
 app.get('/', (req, res) => {
-  res.send('VJS Properties Bot is Running! +91 8830634493');
+  res.send(`VJS Properties Bot is Running! +91 8830634493 - ${FOOTER}`);
 });
 
-// Webhook verification - Meta will call this
 app.get('/webhook', (req, res) => {
   const mode = req.query['hub.mode'];
   const token = req.query['hub.verify_token'];
@@ -30,7 +31,6 @@ app.get('/webhook', (req, res) => {
   }
 });
 
-// Handle incoming messages
 app.post('/webhook', async (req, res) => {
   try {
     const body = req.body;
@@ -41,17 +41,17 @@ app.post('/webhook', async (req, res) => {
       const messages = value?.messages;
       
       if (messages && messages[0]) {
-        const from = messages[0].from; // customer phone
+        const from = messages[0].from;
         const msgBody = messages[0].text?.body?.toLowerCase().trim() || "";
-        const msgType = messages[0].type;
         
         console.log(`Message from ${from}: ${msgBody}`);
         
         let reply = "";
         
-        // LANGUAGE SELECTOR LOGIC
         if (msgBody.includes("hi") || msgBody.includes("hello") || msgBody.includes("namaste") || msgBody === "" || msgBody.length < 2) {
-          reply = `🙏 Namaste! VJS Properties - MahaRERA Certified Since 2000
+          reply = `🙏 Namaste! VJS Properties
+
+${FOOTER}
 
 Thank you for your enquiry for Kharadi / Mundhwa / Wagholi property.
 
@@ -81,6 +81,7 @@ I will instantly send:
 ✓ MahaRERA Certificate + QR
 ✓ Live location + drone video
 
+${FOOTER}
 - Vijay | VJS Properties | +91 8830634493`;
         }
         else if (msgBody === "2" || msgBody.includes("marathi") || msgBody === "मराठी") {
@@ -98,8 +99,8 @@ I will instantly send:
 ✓ खरा फ्लोअर प्लॅन + किंमत
 ✓ MahaRERA प्रमाणपत्र + QR
 ✓ लोकेशन + ड्रोन व्हिडिओ
-✓ १००% पारदर्शक व्यवहार
 
+${FOOTER}
 - विजय सोन्नी | VJS Properties`;
         }
         else if (msgBody === "3" || msgBody.includes("hindi") || msgBody === "हिंदी") {
@@ -118,31 +119,11 @@ I will instantly send:
 ✓ MahaRERA सर्टिफिकेट + QR
 ✓ लोकेशन + ड्रोन वीडियो
 
+${FOOTER}
 - विजय सोन्नी | VJS Properties`;
         }
-        else if (msgBody.includes("l") || msgBody.includes("cr") || msgBody.includes("kharadi") || msgBody.includes("mundhwa") || msgBody.includes("wagholi")) {
-          // Budget/location provided - send options
-          reply = `Got it! Noted ✓
-
-I have 3 verified options ready for you near EON IT Park:
-
-🏠 Option 1: 2 BHK, VTP Altair, ₹85L Onwards - Ready to move
-🏠 Option 2: 2.5 BHK, Gera World of Joy, ₹92L - Riverfront view
-🏠 Option 3: 3 BHK, Godrej Park Greens, ₹1.15Cr - High rental yield
-
-Sending floor plans now via PDF...
-
-Quick question - when can you visit site?
-A) This weekend
-B) Next weekend
-C) Just online video tour for now
-
-Reply A, B or C - I will block your slot with builder. No extra cost.
-
-MahaRERA Certified | Honesty • Transparency • Commitment Since 2000`;
-        }
         else {
-          reply = `Thanks for your message! 🙏
+          reply = `Thanks! 🙏
 
 Please reply:
 1️⃣ - English
@@ -151,10 +132,10 @@ Please reply:
 
 Or tell me your budget & location like "85L, Kharadi"
 
+${FOOTER}
 - VJS Properties | +91 8830634493`;
         }
 
-        // Send reply via WhatsApp API
         await axios({
           method: "POST",
           url: `https://graph.facebook.com/v20.0/${PHONE_NUMBER_ID}/messages`,
@@ -179,5 +160,5 @@ Or tell me your budget & location like "85L, Kharadi"
 });
 
 app.listen(PORT, () => {
-  console.log(`VJS Bot listening on port ${PORT}`);
+  console.log(`VJS Bot listening on port ${PORT} - ${FOOTER}`);
 });
